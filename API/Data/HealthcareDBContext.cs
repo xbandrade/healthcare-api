@@ -2,16 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthcareAPI;
 
-public class HealthcareDBContext : DbContext
+public class HealthcareDBContext(DbContextOptions<HealthcareDBContext> options) : DbContext(options)
 {
-    public DbSet<Patient> Patients { get; set; }
-    public DbSet<Doctor> Doctors { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
-
-    public HealthcareDBContext(DbContextOptions<HealthcareDBContext> options)
-        : base(options)
-    {
-    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -20,11 +14,13 @@ public class HealthcareDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Patient>().HasBaseType<User>();
+        modelBuilder.Entity<StaffMember>().HasBaseType<User>();
+        modelBuilder.Entity<Doctor>().HasBaseType<StaffMember>();
         modelBuilder.Entity<Appointment>()
             .HasOne(a => a.Patient)
             .WithMany(p => p.Appointments)
             .HasForeignKey(a => a.PatientId);
-
         modelBuilder.Entity<Appointment>()
             .HasOne(a => a.Doctor)
             .WithMany(d => d.Appointments)

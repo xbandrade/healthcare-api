@@ -13,8 +13,8 @@ public class Appointment
     public string? DoctorName { get; set; }
     [JsonIgnore]
     public Doctor Doctor { get; set;} = new();
-    public string? Title { get; set; }
-    public DateTime BookingDate { get; set; }
+    public string Title { get; set; } = "";
+    public DateTime BookingDate { get; private set; } = DateTime.Now;
     public DateTime AppointmentDate { get; set; }
     public bool IsCompleted { get; set; } = false;
     public string? Details { get; set; }

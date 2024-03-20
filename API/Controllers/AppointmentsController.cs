@@ -5,20 +5,15 @@ namespace HealthcareAPI.Controllers;
 
 [ApiController]
 [Route("appointments")]
-public class AppointmentsController : ControllerBase
+public class AppointmentsController(HealthcareDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context;
+    private readonly HealthcareDBContext _context = context;
 
-    public AppointmentsController(HealthcareDBContext context)
-    {
-        _context = context;
-    }
-    
     [HttpGet]
     public async Task<IActionResult> GetAllAppointments()
     {
         var appointments = await _context.Appointments.ToListAsync();
-        if (!appointments.Any())
+        if (appointments.Count == 0)
         {
             return NotFound();
         }
@@ -43,19 +38,19 @@ public class AppointmentsController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        var doctor = await _context.Doctors.FindAsync(appointment.DoctorId);
+        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == appointment.DoctorId);
         if (doctor == null)
         {
-            doctor = new Doctor();
-            _context.Doctors.Add(doctor);
+            doctor = new();
+            _context.Users.Add(doctor);
         }
         appointment.Doctor = doctor;
         appointment.DoctorName = appointment.Doctor.Name;
-        var patient = await _context.Patients.FindAsync(appointment.PatientId);
+        var patient = await _context.Users.OfType<Patient>().FirstOrDefaultAsync(p => p.Id == appointment.DoctorId);
         if (patient == null)
         {
-            patient = new Patient();
-            _context.Patients.Add(patient);
+            patient = new();
+            _context.Users.Add(patient);
         }
         appointment.Patient = patient;
         appointment.PatientName = appointment.Patient.Name;

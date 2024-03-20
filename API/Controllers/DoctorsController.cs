@@ -5,20 +5,15 @@ namespace HealthcareAPI.Controllers;
 
 [ApiController]
 [Route("doctors")]
-public class DoctorsController : ControllerBase
+public class DoctorsController(HealthcareDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context;
+    private readonly HealthcareDBContext _context = context;
 
-    public DoctorsController(HealthcareDBContext context)
-    {
-        _context = context;
-    }
-        
     [HttpGet]
     public async Task<IActionResult> GetAllDoctors()
     {
-        var doctors = await _context.Doctors.ToListAsync();
-        if (!doctors.Any())
+        var doctors = await _context.Users.OfType<Doctor>().ToListAsync();
+        if (doctors.Count == 0)
         {
             return NotFound();
         }
@@ -28,7 +23,7 @@ public class DoctorsController : ControllerBase
     [HttpGet("{id}", Name = "GetDoctor")]
     public async Task<IActionResult> GetDoctor(int id)
     {
-        var doctor = await _context.Doctors.FindAsync(id);
+        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(p => p.Id == id);
         if (doctor == null)
         {
             return NotFound();
@@ -39,11 +34,12 @@ public class DoctorsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateDoctor([FromBody] Doctor doctor)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || doctor.Password is null)
         {
             return BadRequest(ModelState);
         }
-        _context.Doctors.Add(doctor);
+        doctor.SetPassword(doctor.Password);
+        _context.Users.Add(doctor);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetDoctor", new { id = doctor.Id }, doctor);
     }
@@ -51,12 +47,12 @@ public class DoctorsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDoctor(int id)
     {    
-        var doctor = await _context.Doctors.FindAsync(id);
+        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(p => p.Id == id);
         if (doctor == null)
         {
             return NotFound();
         }
-        _context.Doctors.Remove(doctor);
+        _context.Users.Remove(doctor);
         await _context.SaveChangesAsync();
         return NoContent();
     }
