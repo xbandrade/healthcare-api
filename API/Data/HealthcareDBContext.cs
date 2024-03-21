@@ -25,6 +25,12 @@ public class HealthcareDBContext(DbContextOptions<HealthcareDBContext> options) 
             .HasOne(a => a.Doctor)
             .WithMany(d => d.Appointments)
             .HasForeignKey(a => a.DoctorId);
+        modelBuilder.Entity<StaffMember>()
+            .HasIndex(s => s.Username)
+            .IsUnique();
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
         base.OnModelCreating(modelBuilder);
     }
 }

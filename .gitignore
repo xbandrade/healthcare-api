@@ -156,6 +156,7 @@
 **/net7.0
 **/net8.0
 **/secrets.*
+**/appsettings.*
 **/*~
 **/*.dbmdl
 **/*.db
@@ -228,3 +229,7 @@
 *.msix
 *.msm
 *.msp
+
+
+API/appsettings.Development.json
+API/appsettings.json

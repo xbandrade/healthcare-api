@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthcareAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("patients")]
 public class PatientsController(HealthcareDBContext context) : ControllerBase
@@ -34,11 +36,10 @@ public class PatientsController(HealthcareDBContext context) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreatePatient([FromBody] Patient patient)
     {
-        if (!ModelState.IsValid || patient.Password is null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
-        patient.SetPassword(patient.Password);
         _context.Users.Add(patient);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetPatient", new { id = patient.Id }, patient);

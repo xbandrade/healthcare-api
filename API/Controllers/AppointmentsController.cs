@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthcareAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("appointments")]
 public class AppointmentsController(HealthcareDBContext context) : ControllerBase
@@ -36,22 +38,20 @@ public class AppointmentsController(HealthcareDBContext context) : ControllerBas
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
         var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == appointment.DoctorId);
         if (doctor == null)
         {
-            doctor = new();
-            _context.Users.Add(doctor);
+            return BadRequest("Invalid Doctor ID");
+        }
+        var patient = await _context.Users.OfType<Patient>().FirstOrDefaultAsync(p => p.Id == appointment.PatientId);
+        if (patient == null)
+        {
+            return BadRequest("Invalid Patient ID");
         }
         appointment.Doctor = doctor;
         appointment.DoctorName = appointment.Doctor.Name;
-        var patient = await _context.Users.OfType<Patient>().FirstOrDefaultAsync(p => p.Id == appointment.DoctorId);
-        if (patient == null)
-        {
-            patient = new();
-            _context.Users.Add(patient);
-        }
         appointment.Patient = patient;
         appointment.PatientName = appointment.Patient.Name;
         _context.Appointments.Add(appointment);

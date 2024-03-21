@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthcareAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("doctors")]
 public class DoctorsController(HealthcareDBContext context) : ControllerBase
@@ -23,7 +25,7 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
     [HttpGet("{id}", Name = "GetDoctor")]
     public async Task<IActionResult> GetDoctor(int id)
     {
-        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(p => p.Id == id);
+        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == id);
         if (doctor == null)
         {
             return NotFound();
@@ -34,11 +36,11 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateDoctor([FromBody] Doctor doctor)
     {
-        if (!ModelState.IsValid || doctor.Password is null)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
-        doctor.SetPassword(doctor.Password);
+        doctor.SetPassword();
         _context.Users.Add(doctor);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetDoctor", new { id = doctor.Id }, doctor);
@@ -47,7 +49,7 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDoctor(int id)
     {    
-        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(p => p.Id == id);
+        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == id);
         if (doctor == null)
         {
             return NotFound();

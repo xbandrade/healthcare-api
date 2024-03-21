@@ -8,14 +8,15 @@ public class Appointment
     public int PatientId { get; set; }
     public string? PatientName { get; set; }
     [JsonIgnore]
-    public Patient Patient { get; set;} = new();
+    public Patient? Patient { get; set; }
     public int DoctorId { get; set; }
     public string? DoctorName { get; set; }
     [JsonIgnore]
-    public Doctor Doctor { get; set;} = new();
+    public Doctor? Doctor { get; set; }
     public string Title { get; set; } = "";
     public DateTime BookingDate { get; private set; } = DateTime.Now;
     public DateTime AppointmentDate { get; set; }
     public bool IsCompleted { get; set; } = false;
     public string? Details { get; set; }
+    public string? Results { get; set; }
 }
