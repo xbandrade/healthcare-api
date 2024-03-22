@@ -170,6 +170,8 @@
 **/*.mdf
 **/*.ldf
 **/*.ndf
+**/*-shm
+**/*-wal
 
 # Visual Studio 6 workspace and project file
 **/*.dsw
@@ -231,5 +233,3 @@
 *.msp
 
 
-API/appsettings.Development.json
-API/appsettings.json

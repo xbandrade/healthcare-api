@@ -17,11 +17,8 @@ public class AuthController(IConfiguration configuration, HealthcareDBContext co
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        Console.WriteLine($"Username: {request.Username}");
-        Console.WriteLine($"Password: {request.Password}");
         var user = GetUserByUsername(request.Username);
-        Console.WriteLine($"Name: {user?.Name}");
-        if (user != null && !user.VerifyPassword(request.Password))
+        if (user != null && user.VerifyPassword(request.Password))
         {
             return Ok(GenerateToken(user));
         }

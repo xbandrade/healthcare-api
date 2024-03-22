@@ -4,13 +4,11 @@ using System.Text;
 namespace HealthcareAPI;
 
 public class PasswordManager {
-    internal static string GenerateSalt()
+    private static string GenerateSalt()
     {
         byte[] saltBytes = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(saltBytes);
-        }
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(saltBytes);
         return Convert.ToBase64String(saltBytes);
     }
     
@@ -22,10 +20,10 @@ public class PasswordManager {
         }
         string salt = GenerateSalt();
         string hashedPassword = HashPassword(password, salt);
-        return (salt, hashedPassword);
+        return (hashedPassword, salt);
     }
 
-    internal static string HashPassword(string password, string salt)
+    private static string HashPassword(string password, string salt)
     {
         byte[] saltBytes = Convert.FromBase64String(salt);
         byte[] passwordBytes = Encoding.UTF8.GetBytes(password);

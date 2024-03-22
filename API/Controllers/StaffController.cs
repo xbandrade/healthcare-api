@@ -14,7 +14,6 @@ public class StaffController(HealthcareDBContext context) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllStaffMembers()
     {
-        Console.WriteLine("hi");
         var staffMembers = await _context.Users.OfType<StaffMember>().ToListAsync();
         if (staffMembers.Count == 0)
         {
