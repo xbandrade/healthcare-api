@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace HealthcareAPI;
 
@@ -14,23 +15,24 @@ public class HealthcareDBContext(DbContextOptions<HealthcareDBContext> options) 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>().HasKey(u => u.Id);
         modelBuilder.Entity<Patient>().HasBaseType<User>();
         modelBuilder.Entity<StaffMember>().HasBaseType<User>();
         modelBuilder.Entity<Doctor>().HasBaseType<StaffMember>();
         modelBuilder.Entity<Appointment>()
-            .HasOne(a => a.Patient)
-            .WithMany(p => p.Appointments)
-            .HasForeignKey(a => a.PatientId);
-        modelBuilder.Entity<Appointment>()
-            .HasOne(a => a.Doctor)
+            .HasOne<Doctor>()
             .WithMany(d => d.Appointments)
             .HasForeignKey(a => a.DoctorId);
+        modelBuilder.Entity<Appointment>()
+            .HasOne<Patient>()
+            .WithMany(p => p.Appointments)
+            .HasForeignKey(a => a.PatientId);
         modelBuilder.Entity<StaffMember>()
             .HasIndex(s => s.Username)
             .IsUnique();
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
-        base.OnModelCreating(modelBuilder);
     }
 }

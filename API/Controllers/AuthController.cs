@@ -15,10 +15,10 @@ public class AuthController(IConfiguration configuration, HealthcareDBContext co
     private readonly HealthcareDBContext _context = context;
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public IActionResult Login([FromBody] LoginDTO request)
     {
-        var user = GetUserByUsername(request.Username);
-        if (user != null && user.VerifyPassword(request.Password))
+        var user = GetUserByUsername(request.Username ?? "");
+        if (user != null && user.VerifyPassword(request.Password ?? ""))
         {
             return Ok(GenerateToken(user));
         }

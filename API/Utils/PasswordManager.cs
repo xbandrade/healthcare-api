@@ -1,9 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
-
+using Konscious.Security.Cryptography;
 namespace HealthcareAPI;
 
-public class PasswordManager {
+public class PasswordManager
+{
     private static string GenerateSalt()
     {
         byte[] saltBytes = new byte[32];
@@ -26,11 +27,14 @@ public class PasswordManager {
     private static string HashPassword(string password, string salt)
     {
         byte[] saltBytes = Convert.FromBase64String(salt);
-        byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-        byte[] combinedBytes = new byte[saltBytes.Length + passwordBytes.Length];
-        Array.Copy(saltBytes, 0, combinedBytes, 0, saltBytes.Length);
-        Array.Copy(passwordBytes, 0, combinedBytes, saltBytes.Length, passwordBytes.Length);
-        byte[] hashedBytes = SHA256.HashData(combinedBytes);
+        using var hasher = new Argon2id(Encoding.UTF8.GetBytes(password))
+        {
+            Salt = saltBytes,
+            DegreeOfParallelism = 8,
+            MemorySize = 65536,
+            Iterations = 8
+        };
+        byte[] hashedBytes = hasher.GetBytes(32);
         return Convert.ToBase64String(hashedBytes);
     }
 

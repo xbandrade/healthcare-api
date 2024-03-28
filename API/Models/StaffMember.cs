@@ -1,16 +1,16 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-
 namespace HealthcareAPI;
 
 public class StaffMember : User
 {
-    public string Status { get; set; } = "Active";
-    [Required(ErrorMessage = "Username field cannot be empty")]
+    public string? Status { get; set; }
     public string? Username { get; set; }
-    [Required(ErrorMessage = "Password field cannot be empty")]
-    public string? Password { get; set; }
+    private string? _hashedPassword;
     [JsonIgnore]
+    public string? HashedPassword {
+        get { return _hashedPassword; }
+        private set { _hashedPassword = value; }
+    }
     private string? _salt;
     [JsonIgnore]
     public string? Salt {
@@ -18,23 +18,23 @@ public class StaffMember : User
         private set { _salt = value; }
     }
 
-    public void SetPassword()
+    public void SetPassword(string password)
     {
-        (Password, Salt) = PasswordManager.SetPassword(Password ?? "");
+        (HashedPassword, Salt) = PasswordManager.SetPassword(password);
     }
 
-    public bool VerifyPassword(string pwd)
+    public bool VerifyPassword(string password)
     {
-        if (Password is null || Salt is null)
+        if (HashedPassword is null || Salt is null)
         {
             Console.WriteLine("Password or salt is null");
             return false;
         }
-        return PasswordManager.VerifyPassword(pwd, Salt, Password);
+        return PasswordManager.VerifyPassword(password, Salt, HashedPassword);
     }
 
     public bool IsPasswordValid()
     {
-        return !string.IsNullOrEmpty(Password);
+        return !string.IsNullOrEmpty(HashedPassword);
     }
 }
