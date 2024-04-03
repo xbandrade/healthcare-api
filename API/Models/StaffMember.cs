@@ -18,9 +18,9 @@ public class StaffMember : User
         private set { _salt = value; }
     }
 
-    public void SetPassword(string password)
+    public void SetPassword(string? password)
     {
-        (HashedPassword, Salt) = PasswordManager.SetPassword(password);
+        (HashedPassword, Salt) = PasswordManager.SetPassword(password ?? "");
     }
 
     public bool VerifyPassword(string password)

@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace HealthcareAPI;
 
 public class Appointment

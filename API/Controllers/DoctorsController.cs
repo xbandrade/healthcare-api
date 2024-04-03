@@ -90,7 +90,8 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
                 }
             }
         }
-        if (!string.IsNullOrEmpty(accountDTO.Password))
+        var passwordChanged = !string.IsNullOrEmpty(accountDTO.Password);
+        if (passwordChanged)
         {
             doctor.SetPassword(accountDTO.Password);
         }
