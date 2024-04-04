@@ -21,7 +21,6 @@ public class AuthController(IConfiguration configuration, HealthcareDBContext co
         return Unauthorized();
     }
 
-
     [Authorize]
     [HttpGet("verify")]
     public IActionResult VerifyToken()

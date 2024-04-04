@@ -4,7 +4,7 @@
         Title="Healthcare Staff"
         WindowState="Maximized" Width="1366" Height="768" Icon="/Views/icon.ico">
     <Window.Resources>
-        <Style x:Key="Placeholder" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Style x:Key="TextBoxPlaceholder" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TextBox}">
@@ -60,17 +60,17 @@
                 <ColumnDefinition Width="166*"/>
                 <ColumnDefinition Width="319*"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="LoginTitleLabel" Content="Healthcare Staff" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="78" FontFamily="Palatino Linotype" FontWeight="Bold" Height="188" Width="600" Background="{x:Null}" Margin="172,-58,0,0" Grid.ColumnSpan="2">
-                <Label.Foreground>
+            <TextBlock x:Name="LoginTitleTextBlock" Text="Healthcare Staff" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="78" FontFamily="Palatino Linotype" FontWeight="Bold" Height="188" Width="574" Background="{x:Null}" Margin="186,-58,0,0" Grid.ColumnSpan="2">
+                <TextBlock.Foreground>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#FF000F0F"/>
                         <GradientStop Color="#FF081B1C" Offset="1"/>
                         <GradientStop Color="#FF092728" Offset="0.293"/>
                         <GradientStop Color="#FF255F62" Offset="0.644"/>
                     </LinearGradientBrush>
-                </Label.Foreground>
-            </Label>
-            <TextBox x:Name="UsernameTextBox" TextWrapping="Wrap" Width="286" Height="65" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold" AcceptsTab="True" TabIndex="2147483645" TextAlignment="Center" Style="{StaticResource Placeholder}" Tag="Username" Margin="330,130,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.ColumnSpan="2">
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBox x:Name="UsernameTextBox" TextWrapping="Wrap" Width="286" Height="65" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold" TabIndex="2147483643" TextAlignment="Center" Margin="0,116,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" FlowDirection="LeftToRight">
                 <TextBox.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#FFCBFAF5"/>
@@ -78,15 +78,17 @@
                     </LinearGradientBrush>
                 </TextBox.Background>
             </TextBox>
-            <TextBox x:Name="PasswordTextBox" TextWrapping="Wrap" Width="286" Height="64" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold" AcceptsTab="True" TabIndex="2147483646" TextAlignment="Center" Style="{StaticResource Placeholder}" Tag="Password" Margin="330,254,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.ColumnSpan="2">
-                <TextBox.Background>
+            <PasswordBox x:Name="PasswordBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="286" Height="65" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold" Grid.ColumnSpan="2" Margin="330,254,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" PasswordChar="*" TabIndex="2147483644" FlowDirection="LeftToRight">
+                <PasswordBox.Resources>
+                </PasswordBox.Resources>
+                <PasswordBox.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#FFCBFAF5"/>
+                        <GradientStop Color="#FFCBFAF5" Offset="0"/>
                         <GradientStop Color="#FF70A5CE" Offset="1"/>
                     </LinearGradientBrush>
-                </TextBox.Background>
-            </TextBox>
-            <Button x:Name="LoginButton" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Height="58" Width="136" Margin="72,449,0,0" FontFamily="Palatino Linotype" FontSize="24" FontWeight="Bold" Click="LoginButton_Click" Grid.Column="1">
+                </PasswordBox.Background>
+            </PasswordBox>
+            <Button x:Name="LoginButton" Content="Login" HorizontalAlignment="Left" VerticalAlignment="Top" Height="58" Width="136" Margin="73,450,0,0" FontFamily="Palatino Linotype" FontSize="24" FontWeight="Bold" Click="LoginButton_ClickAsync" Grid.Column="1" TabIndex="2147483645">
                 <Button.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#FF3F91A0"/>
@@ -99,18 +101,53 @@
                     </LinearGradientBrush>
                 </Button.Background>
             </Button>
-        </Grid>
-        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" Visibility="Collapsed">
-            <Label x:Name="MenuTitleLabel" Content="Healthcare Staff" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="48" FontFamily="Palatino Linotype" FontWeight="Bold" Height="80" Width="364" Background="{x:Null}" FlowDirection="LeftToRight">
+            <TextBlock x:Name="InvalidLoginTextBlock" HorizontalAlignment="Left" Margin="277,371,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" Width="392" FontFamily="Palatino Linotype" FontWeight="Bold" FontSize="28" Text="Invalid username or password" Grid.ColumnSpan="2" Visibility="Collapsed">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF810000" Offset="0"/>
+                        <GradientStop Color="#FF7E0505" Offset="1"/>
+                        <GradientStop Color="#FF610000" Offset="0.502"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBlock x:Name="LoggingTextBlock" HorizontalAlignment="Left" Margin="60,369,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="43" Width="162" FontFamily="Palatino Linotype" FontWeight="Bold" FontSize="28" Visibility="Collapsed" Text="Logging in..." Grid.Column="1" TextTrimming="None" FlowDirection="LeftToRight">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF0AA019" Offset="0"/>
+                        <GradientStop Color="#FF07832E" Offset="1"/>
+                        <GradientStop Color="#FF053735" Offset="0.502"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground></TextBlock>
+            <Label x:Name="UsernameLabel" Grid.Column="1" Content="Username" HorizontalAlignment="Left" Margin="52,57,0,0" VerticalAlignment="Top" Width="178" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold">
                 <Label.Foreground>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#FF000F0F"/>
-                        <GradientStop Color="#FF081B1C" Offset="1"/>
-                        <GradientStop Color="#FF092728" Offset="0.293"/>
-                        <GradientStop Color="#FF084245" Offset="0.644"/>
+                        <GradientStop Color="#FF0D1841"/>
+                        <GradientStop Color="#FF0C3D34" Offset="0.985"/>
+                        <GradientStop Color="#FF334DAB" Offset="0.477"/>
                     </LinearGradientBrush>
                 </Label.Foreground>
             </Label>
+            <Label x:Name="PasswordLabel" Grid.Column="1" Content="Password" HorizontalAlignment="Left" Margin="56,195,0,0" VerticalAlignment="Top" Width="170" FontSize="36" FontFamily="Palatino Linotype" FontWeight="Bold">
+                <Label.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF0D1841"/>
+                        <GradientStop Color="#FF0C3D34" Offset="0.985"/>
+                        <GradientStop Color="#FF334DAB" Offset="0.477"/>
+                    </LinearGradientBrush>
+                </Label.Foreground>
+            </Label>
+        </Grid>
+        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" Visibility="Collapsed">
+            <TextBlock x:Name="MenuTitleTextBlock" Text="Healthcare Staff" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="48" FontFamily="Palatino Linotype" FontWeight="Bold" Height="80" Width="354" Background="{x:Null}" FlowDirection="LeftToRight">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF010009"/>
+                        <GradientStop Color="#FF04073A" Offset="0.997"/>
+                        <GradientStop Color="#FF053436" Offset="0.302"/>
+                        <GradientStop Color="#FF044232" Offset="0.644"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
             <Button x:Name="LogoutButton" Content="Logout" HorizontalAlignment="Left" VerticalAlignment="Top" Height="58" Width="136" Margin="10,11,0,0" FontFamily="Palatino Linotype" FontSize="24" FontWeight="Bold" Click="LogoutButton_Click" Grid.RowSpan="2" Grid.ColumnSpan="2" Grid.Row="1" Grid.Column="1">
                 <Button.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
