@@ -8,7 +8,7 @@ public class Appointment
     public int DoctorId { get; set; }
     public string? DoctorName { get; set; }
     public string? Title { get; set; }
-    public DateTime BookingDate { get; private set; } = DateTime.Now;
+    public DateTime BookingDate { get; set; }
     public DateTime AppointmentDate { get; set; }
     public bool IsCompleted { get; set; } = false;
     public string? Details { get; set; }

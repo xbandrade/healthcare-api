@@ -10,6 +10,8 @@ namespace HealthcareAPI.Controllers;
 public class AppointmentsController(HealthcareDBContext context) : ControllerBase
 {
     private readonly HealthcareDBContext _context = context;
+    private static readonly string[] invalidDoctor = ["Invalid Doctor ID"];
+    private static readonly string[] invalidPatient = ["Invalid Patient ID"];
 
     [HttpGet]
     public async Task<IActionResult> GetAllAppointments()
@@ -43,12 +45,24 @@ public class AppointmentsController(HealthcareDBContext context) : ControllerBas
         var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == appointment.DoctorId);
         if (doctor is null)
         {
-            return BadRequest("Invalid Doctor ID");
+            return BadRequest(new
+            {
+                errors = new
+                {
+                    Doctor = invalidDoctor,
+                },
+            });
         }
         var patient = await _context.Users.OfType<Patient>().FirstOrDefaultAsync(p => p.Id == appointment.PatientId);
         if (patient is null)
         {
-            return BadRequest("Invalid Patient ID");
+            return BadRequest(new
+            {
+                errors = new
+                {
+                    Patient = invalidPatient,
+                },
+            });
         }
         appointment.DoctorName = doctor.Name;
         appointment.PatientName = patient.Name;
@@ -56,7 +70,6 @@ public class AppointmentsController(HealthcareDBContext context) : ControllerBas
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetAppointment", new { id = appointment.Id }, appointment);
     }
-
 
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateAppointment(int id, [FromBody] Appointment appointmentPatch)

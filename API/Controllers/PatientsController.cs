@@ -46,6 +46,7 @@ public class PatientsController(HealthcareDBContext context) : ControllerBase
         {
             return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
+        patient.PatientSince = DateTime.Now;
         _context.Users.Add(patient);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetPatient", new { id = patient.Id }, patient);
