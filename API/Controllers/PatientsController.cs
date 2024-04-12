@@ -1,21 +1,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HealthcareAPI.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthcareAPI.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("patients")]
-public class PatientsController(HealthcareDBContext context) : ControllerBase
+public class PatientsController(BaseDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context = context;
+    private readonly BaseDBContext _context = context;
 
     [HttpGet]
     public async Task<IActionResult> GetAllPatients()
     {
-        var patients = await _context.Users
-            .OfType<Patient>()
+        var patients = await _context
+            .Set<Patient>()
             .Include(p => p.Appointments)
             .ToListAsync();
         if (patients.Count == 0)
@@ -40,13 +42,35 @@ public class PatientsController(HealthcareDBContext context) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePatient([FromBody] Patient patient)
+    public async Task<IActionResult> CreatePatient([FromBody] PatientDTO accountDTO)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || accountDTO is null)
         {
             return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
-        patient.PatientSince = DateTime.Now;
+        var requiredProperties = typeof(PatientDTO).GetProperties()
+            .Where(p => Attribute.IsDefined(p, typeof(RequiredAttribute)));
+        var missingProperties = requiredProperties
+            .Where(p => p.GetValue(accountDTO) == null)
+            .Select(p => p.Name);
+        if (missingProperties.Any())
+        {
+            return BadRequest($"Missing required properties: {string.Join(", ", missingProperties)}");
+        }
+        var patient = new Patient
+        {
+            Name = accountDTO.Name,
+            Email = accountDTO.Email,
+            Phone = accountDTO.Phone,
+            Address = accountDTO.Address,
+            Gender = accountDTO.Gender,
+            Age = accountDTO.Age ?? -1,
+            PatientSince = DateTime.Now,
+            BirthDate = accountDTO.BirthDate ?? DateTime.MinValue,
+            BloodGroup = accountDTO.BloodGroup,
+            Allergies = accountDTO.Allergies,
+            AdditionalInfo = accountDTO.AdditionalInfo,
+        };
         _context.Users.Add(patient);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetPatient", new { id = patient.Id }, patient);

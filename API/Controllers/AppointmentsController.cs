@@ -1,22 +1,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HealthcareAPI.Data;
 
 namespace HealthcareAPI.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("appointments")]
-public class AppointmentsController(HealthcareDBContext context) : ControllerBase
+public class AppointmentsController(BaseDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context = context;
+    private readonly BaseDBContext _context = context;
     private static readonly string[] invalidDoctor = ["Invalid Doctor ID"];
     private static readonly string[] invalidPatient = ["Invalid Patient ID"];
 
     [HttpGet]
     public async Task<IActionResult> GetAllAppointments()
     {
-        var appointments = await _context.Appointments.ToListAsync();
+        var appointments = await _context
+            .Set<Appointment>()
+            .ToListAsync();
         if (appointments.Count == 0)
         {
             return NotFound();
@@ -38,7 +41,7 @@ public class AppointmentsController(HealthcareDBContext context) : ControllerBas
     [HttpPost]
     public async Task<IActionResult> CreateAppointment([FromBody] Appointment appointment)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || appointment is null)
         {
             return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
         }
@@ -66,6 +69,7 @@ public class AppointmentsController(HealthcareDBContext context) : ControllerBas
         }
         appointment.DoctorName = doctor.Name;
         appointment.PatientName = patient.Name;
+        appointment.BookingDate = DateTime.Now;
         _context.Appointments.Add(appointment);
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetAppointment", new { id = appointment.Id }, appointment);

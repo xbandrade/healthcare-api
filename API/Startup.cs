@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using HealthcareAPI.Data;
 
 namespace HealthcareAPI;
 public class Startup(IConfiguration configuration)
@@ -17,6 +18,8 @@ public class Startup(IConfiguration configuration)
             c.EnableAnnotations();
         });
         services.AddDbContext<HealthcareDBContext>();
+        services.AddDbContext<BaseDBContext>();
+        services.AddScoped<BaseDBContext, HealthcareDBContext>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();   
         services.AddAuthorization();

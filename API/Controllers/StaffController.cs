@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HealthcareAPI.Data;
 
 namespace HealthcareAPI.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("staff")]
-public class StaffController(HealthcareDBContext context) : ControllerBase
+public class StaffController(BaseDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context = context;
+    private readonly BaseDBContext _context = context;
 
     [HttpGet]
     public async Task<IActionResult> GetAllStaffMembers()
@@ -34,7 +35,7 @@ public class StaffController(HealthcareDBContext context) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateStaffMember([FromBody] AccountDTO accountDTO)
+    public async Task<IActionResult> CreateStaffMember([FromBody] StaffDTO accountDTO)
     {
         if (!ModelState.IsValid || accountDTO is null)
         {
@@ -56,7 +57,6 @@ public class StaffController(HealthcareDBContext context) : ControllerBase
         await _context.SaveChangesAsync();
         return CreatedAtRoute("GetStaffMember", new { id = staffMember.Id }, staffMember);
     }
-
 
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateStaffMember(int id, [FromBody] PatchRequestDTO accountDTO)

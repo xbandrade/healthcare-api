@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using HealthcareAPI.Data;
 
 namespace HealthcareAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController(IConfiguration configuration, HealthcareDBContext context) : ControllerBase
+public class AuthController(IConfiguration configuration, BaseDBContext context) : ControllerBase
 {
     private readonly IConfiguration _configuration = configuration;
-    private readonly HealthcareDBContext _context = context;
+    private readonly BaseDBContext _context = context;
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDTO request)
@@ -30,6 +31,6 @@ public class AuthController(IConfiguration configuration, HealthcareDBContext co
 
     private StaffMember? GetUserByUsername(string username)
     {
-        return _context.Users.OfType<StaffMember>().FirstOrDefault(u => u.Username == username);
+        return _context.StaffMembers.FirstOrDefault(s => s.Username == username);
     }
 }

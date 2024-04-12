@@ -1,21 +1,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HealthcareAPI.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthcareAPI.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("doctors")]
-public class DoctorsController(HealthcareDBContext context) : ControllerBase
+public class DoctorsController(BaseDBContext context) : ControllerBase
 {
-    private readonly HealthcareDBContext _context = context;
+    private readonly BaseDBContext _context = context;
 
     [HttpGet]
     public async Task<IActionResult> GetAllDoctors()
     {
-        var doctors = await _context.Users
-            .OfType<Doctor>()
+        var doctors = await _context
+            .Set<Doctor>()
             .Include(d => d.Appointments)
             .ToListAsync();
         if (doctors.Count == 0)
@@ -40,11 +42,20 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateDoctor([FromBody] AccountDTO accountDTO)
+    public async Task<IActionResult> CreateDoctor([FromBody] StaffDTO accountDTO)
     {
         if (!ModelState.IsValid || accountDTO is null)
         {
             return BadRequest(ModelState.Values.FirstOrDefault()?.Errors.FirstOrDefault()?.ErrorMessage);
+        }
+        var requiredProperties = typeof(StaffDTO).GetProperties()
+            .Where(p => Attribute.IsDefined(p, typeof(RequiredAttribute)));
+        var missingProperties = requiredProperties
+            .Where(p => p.GetValue(accountDTO) == null)
+            .Select(p => p.Name);
+        if (missingProperties.Any())
+        {
+            return BadRequest($"Missing required properties: {string.Join(", ", missingProperties)}");
         }
         var doctor = new Doctor
         {
@@ -110,7 +121,7 @@ public class DoctorsController(HealthcareDBContext context) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDoctor(int id)
     {    
-        var doctor = await _context.Users.OfType<Doctor>().FirstOrDefaultAsync(d => d.Id == id);
+        var doctor = await _context.Set<Doctor>().FirstOrDefaultAsync(d => d.Id == id);
         if (doctor is null)
         {
             return NotFound();
