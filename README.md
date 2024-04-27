@@ -21,11 +21,6 @@
 
 The following accordions contain the model schemas and the API endpoints:
 
-<style>
-    summary { font-size: 22px; }
-    summary::-webkit-details-marker { font-size: 22px; }
-</style>
-
 <details>
 <summary>Schemas</summary>
 
